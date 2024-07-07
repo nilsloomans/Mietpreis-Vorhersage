@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ergebnis der Preisvorhersage</title>
+</head>
+<body>
+    <h1>Ergebnis der Preisvorhersage</h1>
+    <p>Stadt: {{ city }}</p>
+    <p>Jahr: {{ year }}</p>
+    <p>Quadratmeter: {{ square_meters }}</p>
+    <h2>Berechnete Preise:</h2>
+    <ul>
+        {% for model, total_price in total_prices.items() %}
+        <li>{{ model }}: {{ "%.2f" | format(total_price) }} €</li>
+        {% endfor %}
+    </ul>
+    <a href="/">Neue Berechnung</a>
+</body>
+</html>
