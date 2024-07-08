@@ -1,3 +1,4 @@
+# Importieren der notwendigen Bibliotheken
 from flask import Flask, render_template, request
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -5,10 +6,11 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import r2_score
 
+# Initialisieren der Flask-Anwendung
 app = Flask(__name__)
 
+# Definition der Immobilienpreisdaten für verschiedene Städte und Jahre
 data_list = [
     ("Berlin", {
         2024: 23.75, 2023: 21.6, 2022: 23.57, 2021: 15.14, 2020: 15.11, 2019: 13.41, 2018: 12.65,
@@ -52,18 +54,24 @@ data_list = [
     })
 ]
 
+# Funktion zur Vorhersage der Immobilienpreise für eine bestimmte Stadt
 def forecast_for_city(city, prices, forecast_year):
+    # Vorbereitung der Daten
     data = [[year, price] for year, price in prices.items()]
     df = pd.DataFrame(data, columns=["Jahr", "Preis"])
-    
+
+    # Entfernen des Vorhersagejahres, falls es in den Daten enthalten ist
     if forecast_year in df["Jahr"].values:
         df = df[df["Jahr"] != forecast_year]
-    
+
+    # Definieren der Merkmale (X) und Zielvariablen (y)
     X = df[["Jahr"]]
     y = df["Preis"]
-    
+
+    # Aufteilen der Daten in Trainings- und Testdatensätze
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
+
+    # Initialisierung der Vorhersagen und Modelle
     predictions = {}
     models = {
         "Linear Regression": LinearRegression(),
@@ -72,55 +80,61 @@ def forecast_for_city(city, prices, forecast_year):
         "Random Forest": RandomForestRegressor(n_estimators=100)
     }
 
+    # Lineare Regression
     model_lr = models["Linear Regression"]
     model_lr.fit(X_train, y_train)
-    y_pred_lr = model_lr.predict(X_test)
-    r2_lr = r2_score(y_test, y_pred_lr)
     predictions["Linear Regression"] = model_lr.predict([[forecast_year]])[0]
 
+    # Polynomiale Regression (Grad 2)
     poly_features = PolynomialFeatures(degree=2)
     X_poly = poly_features.fit_transform(X)
     model_pr = models["Polynomial Regression"]
     model_pr.fit(poly_features.transform(X_train), y_train)
-    y_pred_pr = model_pr.predict(poly_features.transform(X_test))
-    r2_pr = r2_score(y_test, y_pred_pr)
     predictions["Polynomial Regression"] = model_pr.predict(poly_features.transform([[forecast_year]]))[0]
 
+    # Entscheidungsbaum
     model_dt = models["Decision Tree"]
     model_dt.fit(X_train, y_train)
-    y_pred_dt = model_dt.predict(X_test)
-    r2_dt = r2_score(y_test, y_pred_dt)
     predictions["Decision Tree"] = model_dt.predict([[forecast_year]])[0]
 
+    # Random Forest
     model_rf = models["Random Forest"]
     model_rf.fit(X_train, y_train)
-    y_pred_rf = model_rf.predict(X_test)
-    r2_rf = r2_score(y_test, y_pred_rf)
     predictions["Random Forest"] = model_rf.predict([[forecast_year]])[0]
 
     return predictions
 
+# Route für die Startseite
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    # Liste der Städte und Jahre für das Dropdown-Menü
     cities = [city for city, _ in data_list]
     years = list(range(2010, 2035))
 
+    # Verarbeitung der Formulardaten
     if request.method == 'POST':
+        # Eingaben des Benutzers
         square_meters = float(request.form['square_meters'])
         city = request.form['city']
         year = int(request.form['year'])
 
+        # Preise der gewählten Stadt finden
         prices = next((prices for city_name, prices in data_list if city_name == city), None)
         if prices is None:
             return "Stadt nicht gefunden", 400
         
+        # Vorhersagen für die gewählte Stadt und das Jahr berechnen
         predictions = forecast_for_city(city, prices, year)
 
+        # Gesamtpreise basierend auf der Wohnfläche berechnen
         total_prices = {model: price * square_meters for model, price in predictions.items()}
         
+        # Ergebnisse rendern
         return render_template('result.html', city=city, year=year, square_meters=square_meters, total_prices=total_prices)
     
+    # Startseite rendern
     return render_template('index.html', cities=cities, years=years)
 
+# Flask-Anwendung starten
 if __name__ == '__main__':
     app.run(debug=True)
