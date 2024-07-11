@@ -1,5 +1,8 @@
 # Mietpreis-Vorhersage
 
+Ziel/Thema:
+Unser Projekt zielt darauf ab, die Mietpreise für das Jahr 2024 mithilfe verschiedener Modelle vorherzusagen. Wir trainieren Modelle wie zum Beispiel Lineare Regression, um die komplexen Beziehungen zwischen historischen Mietpreisdaten und relevanten Variablen zu erfassen und die Mietpreise und das beste Modell zu bestimmen.
+
 Wir haben uns hier mit dem Thema der Mietpreisvorhersage beschäftigt. 
 Um den Code zum laufen zu bringen müssen folgende Dinge vorhanden sein:
 1. Bestenfalls ein Programm zum ausführen den Codes wie z.B. Vs-Code
