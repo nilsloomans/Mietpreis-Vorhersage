@@ -18,3 +18,8 @@ Um den Code zum laufen zu bringen müssen folgende Dinge vorhanden sein:
 11. Wenn alles installiert ist, kann der Code ausgeführt werden:
 12. Die Jupyter Notebooks können eigen ausgeführt werden
 13. Wenn die app.py ausgeführt wird, kommt ein lokaler Link raus auf welchen geklickt werden kann, damit man zu einer Website kommt, womit man mit ein paar Daten spielen kann
+
+Teilnehmer:
+Nils Loomans
+Thanadon Chiangkham
+Tim Kuhn
